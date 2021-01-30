@@ -110,7 +110,7 @@ app.get('/api/rates', (req, res, next) => {
 app.use( (error, req, res, next) => {
     const statusCode = error.statusCode || 500
     const message = error.message 
-    console.log(error)
+    // console.log(error)
     return res.status(statusCode).json({
         statusCode: statusCode,
         message: message
