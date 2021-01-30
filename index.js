@@ -56,9 +56,10 @@ app.get('/api/rates', (req, res, next) => {
         }
 
         const sum_checker = checker.reduce( (a,b)=> a+b, 0 )
+        const base = req.query.base.toUpperCase()
 
         if( sum_checker == 2 ){
-           const check_base_param = codes.find( e => e == req.query.base )
+           const check_base_param = codes.find( e => e == base )
            if(!check_base_param){
                 const err = {}
                 err.message = 'Ops, Code not found in currency code list'
@@ -70,6 +71,30 @@ app.get('/api/rates', (req, res, next) => {
                 const absent_codes = []
                 for (const code of filter_codes) {
                     const find_code = codes.find( e => e == code )
+                    if(!find_code){
+                        absent_codes.push(code)
+                    }else{
+                        present_codes.push(code)
+                    }
+                }
+                if( present_codes.length > 1 ){
+                    // https://api.exchangeratesapi.io/latest?base=PHP&symbols=USD,GBP
+                    axios.get('https://api.exchangeratesapi.io/latest', { params: 
+                    { 
+                        base:base, 
+                        symbols:present_codes.join().toUpperCase().toString()
+                     }
+                 }).then ( result => {
+                        res.status(200).json({
+                            data: result.data,
+                            statusCode: 200
+                        })
+                    }).catch( err => next(err))
+                }else{
+                    const err = {}
+                    err.message =  `Ops, All specified ${absent_codes} not present in he list of currency`
+                    err.statusCode = 404
+                    next(err)
                 }
            }
         }else{
@@ -85,7 +110,7 @@ app.get('/api/rates', (req, res, next) => {
 app.use( (error, req, res, next) => {
     const statusCode = error.statusCode || 500
     const message = error.message 
-
+    console.log(error)
     return res.status(statusCode).json({
         statusCode: statusCode,
         message: message
