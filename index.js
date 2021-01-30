@@ -2,9 +2,13 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const axios = require('axios');
-const { query } = require('express');
+const dotenv = require('dotenv')
 
-const PORT = 3000;
+dotenv.config()
+
+
+
+const PORT = process.env.NODE_ENV == 'development' ? 3000 : process.env.PORT
 const app = express()
 
 app.use(bodyParser.urlencoded({
@@ -92,7 +96,7 @@ app.get('/', (req, res, next) => {
 
     return res.status(200).json({
         message: 'Welcome to the application entry point',
-        statusCode: 200
+        statusCode: 200,
     })
 })
 
