@@ -18,24 +18,6 @@ app.use(bodyParser.json());
 //allowing CORS
 app.use(cors());
 
-
-app.get('/welcome', (req, res, next) => {
-
-    axios.get('https://api.exchangeratesapi.io/latest').then( result => {
-        const prop = []
-        for (const key in result.data.rates) {
-            prop.push(key)
-        }
-        return res.status(200).json({
-            message: 'Welcome to the application entry point',
-            statusCode: 200,
-            name: prop
-        })
-    }).catch( err => next(err))
-
-    
-})
-
 // /api/rates?base=CZK&currency=EUR,GBP,USD
 app.get('/api/rates', (req, res, next) => {
 
@@ -103,6 +85,15 @@ app.get('/api/rates', (req, res, next) => {
             err.statusCode = 500
             next(err)
         }
+})
+
+
+app.get('/', (req, res, next) => {
+
+    return res.status(200).json({
+        message: 'Welcome to the application entry point',
+        statusCode: 200
+    })
 })
 
 
